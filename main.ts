@@ -1,29 +1,28 @@
-// news-image-20261122 v2 entry point.
+// news-image-20261122 v3 — entry program.
 //
-// The front page is rendered ahead of time by draw.py into entry.png
-// next to this file. This program only delivers that image to the
-// grader's output directory.
+// draw.py renders the front page into entry.png beside this file ahead of
+// time. This program only copies that image into the grader's output
+// directory, so it must work no matter which directory the grader runs
+// it from: the image path is resolved from this file's own location.
 //
-// Usage (local check):
+// Local check:
 //   python3 draw.py
-//   cd /tmp && MAKEFUN_OUTPUT_DIR=/tmp/check-out node \
+//   cd /tmp && MAKEFUN_OUTPUT_DIR=/tmp/v3-check node \
 //     ~/workspace/makefun/news-image-20261122-entry/main.ts
-// The image path is resolved from this file's own directory, never
-// from the process working directory, so the grader may invoke it
-// from anywhere.
 
 import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const scriptDir = dirname(fileURLToPath(import.meta.url));
-const sourceImage = join(scriptDir, "entry.png");
+const here = dirname(fileURLToPath(import.meta.url));
+const source = join(here, "entry.png");
 
-if (!existsSync(sourceImage)) {
-  throw new Error(`entry.png not found beside main.ts: ${sourceImage}`);
+if (!existsSync(source)) {
+  throw new Error(`entry.png missing next to main.ts: ${source}`);
 }
 
-const targetDir = resolve(process.env.MAKEFUN_OUTPUT_DIR ?? "/output");
-mkdirSync(targetDir, { recursive: true });
-copyFileSync(sourceImage, join(targetDir, "entry.png"));
-console.log(`entry.png -> ${join(targetDir, "entry.png")}`);
+const outDir = resolve(process.env.MAKEFUN_OUTPUT_DIR ?? "/output");
+mkdirSync(outDir, { recursive: true });
+const dest = join(outDir, "entry.png");
+copyFileSync(source, dest);
+console.log(`entry.png -> ${dest}`);
